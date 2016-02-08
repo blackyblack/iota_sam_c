@@ -11,6 +11,8 @@ static int F[] = { 0, -1, 1, 0, 1, -1, -1, 1, 0 };
 
 static int INDICES[STATE_SIZE] = { 0 }; //729 * 4 bytes
 static int state[STATE_SIZE] = { 0 }; //729 * 4 bytes
+static int leftPart[STATE_SIZE] = { 0 };
+static int rightPart[STATE_SIZE] = { 0 };
 
 static int f(int a, int b) {
   return F[(a + 1) * 3 + (b + 1)];
@@ -19,36 +21,48 @@ static int f(int a, int b) {
 static void transform() {
 
   int index = 0;
-  int leftPart[STATE_SIZE] = { 0 };
-  int rightPart[STATE_SIZE] = { 0 };
+  int indexNext = 0;
+  int round = 0;
+  int i = 0;
 
-  for (int round = NUMBER_OF_ROUNDS; round-- > 0; ) {
+  for (round = NUMBER_OF_ROUNDS; round-- > 0; ) {
 
-    for (int i = 0; i < STATE_SIZE; i++) {
-
+    for (i = 0; i < STATE_SIZE; i++) {
       int a, b;
-      leftPart[i] = f(a = state[index], b = state[index = INDICES[i]]);
+
+      indexNext = INDICES[i];
+      a = state[index];
+      b = state[indexNext];
+      
+      index = indexNext;
+      leftPart[i] = f(a, b);
       rightPart[i] = f(b, a);
     }
 
-    for (int i = 0; i < STATE_SIZE; i++) {
+    for (i = 0; i < STATE_SIZE; i++) {
 
-      state[i] = f(leftPart[index], rightPart[index = INDICES[i]]);
+      indexNext = INDICES[i];
+      state[i] = f(leftPart[index], rightPart[indexNext]);
+      index = indexNext;
     }
   }
 }
 
 void init() {
   int index = 0;
-  for (int i = 0; i < STATE_SIZE; i++) {
+  int i = 0;
 
-    INDICES[i] = index += (index <= STATE_SIZE / 2 ? STATE_SIZE / 2 : (STATE_SIZE / 2 - STATE_SIZE));
+  for (i = 0; i < STATE_SIZE; i++) {
+
+    index += (index <= STATE_SIZE / 2 ? STATE_SIZE / 2 : (STATE_SIZE / 2 - STATE_SIZE));
+    INDICES[i] = index;
   }
 }
 
 void reset() {
+  int i = 0;
 
-  for (int i = 0; i < STATE_SIZE; i++) {
+  for (i = 0; i < STATE_SIZE; i++) {
 
     state[i] = 0;
   }
@@ -70,26 +84,22 @@ void absorb(int input[], int offset, int size) {
 
 void main()
 {
+  long count = 0;
+  double totalDiff = 0;
+  time_t start, end;
+
   init();
   
   fprintf(stderr, "Starting SaM profiling\r\n");
-  time_t start, end;
   time(&start);
-
-  long count = 0;
-  double totalDiff = 0;
 
   while(1) {
     transform();
     count++;
     time(&end);
 
-    double dif = difftime(end, start);
-    totalDiff += dif;
-
+    totalDiff = difftime(end, start);
     if (totalDiff >= 1.0) break;
-
-    time(&start);
   }
   
   fprintf(stderr, "Total %ld transforms per 1 second.\r\n", count);
