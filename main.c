@@ -12,18 +12,24 @@
 #define STATE_SIZE (HASH_SIZE * 3) //729
 #define NUMBER_OF_ROUNDS 9
 
-static int F[] = { 0, -1, 1, 0, 1, -1, -1, 1, 0 };
+#ifdef _WIN32
+#define INLINE __inline 
+#else
+#define INLINE inline
+#endif
+
+static const int F[] = { 0, -1, 1, 0, 1, -1, -1, 1, 0 };
 
 static int INDICES[STATE_SIZE] = { 0 }; //729 * 4 bytes
 static int state[STATE_SIZE] = { 0 }; //729 * 4 bytes
 static int leftPart[STATE_SIZE] = { 0 };
 static int rightPart[STATE_SIZE] = { 0 };
 
-static int f(int a, int b) {
+static INLINE int f(int a, int b) {
   return F[a * 3 + b + 4];
 }
 
-static void transform() {
+static INLINE void transform() {
 
   int index = 0;
   int indexNext = 0;
