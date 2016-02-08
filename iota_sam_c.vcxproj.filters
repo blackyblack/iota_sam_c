@@ -2,5 +2,21 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="win32\gettime.c">
+      <Filter>win32</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="win32">
+      <UniqueIdentifier>{4fc25203-3242-4777-a3bb-f95096b78927}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="win32\gettime.h">
+      <Filter>win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\timespec.h">
+      <Filter>win32</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

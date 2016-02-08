@@ -66,6 +66,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="win32\gettime.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="win32\gettime.h" />
+    <ClInclude Include="win32\timespec.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

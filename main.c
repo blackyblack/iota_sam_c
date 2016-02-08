@@ -1,7 +1,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <time.h>
+
+#ifdef _WIN32
+#include "win32/gettime.h"
+#else
+#include <gettime.h>
+#endif
 
 #define HASH_SIZE 243
 #define STATE_SIZE (HASH_SIZE * 3) //729
@@ -15,7 +20,7 @@ static int leftPart[STATE_SIZE] = { 0 };
 static int rightPart[STATE_SIZE] = { 0 };
 
 static int f(int a, int b) {
-  return F[(a + 1) * 3 + (b + 1)];
+  return F[a * 3 + b + 4];
 }
 
 static void transform() {
@@ -84,24 +89,24 @@ void absorb(int input[], int offset, int size) {
 
 void main()
 {
-  long count = 0;
+  int count = 0;
   double totalDiff = 0;
-  time_t start, end;
+  struct timespeca start, end;
 
   init();
   
   fprintf(stderr, "Starting SaM profiling\r\n");
-  time(&start);
+  clock_gettime(CLOCK_MONOTONIC, &start);
 
   while(1) {
     transform();
     count++;
-    time(&end);
-
-    totalDiff = difftime(end, start);
-    if (totalDiff >= 1.0) break;
+    if(count >= 1000) break;
   }
+
+  clock_gettime(CLOCK_MONOTONIC, &end);
+  totalDiff = time_since(&start, &end);
   
-  fprintf(stderr, "Total %ld transforms per 1 second.\r\n", count);
+  fprintf(stderr, "Total %ld transforms per second.\r\n", (long)(1000/totalDiff));
   getchar();
 }
