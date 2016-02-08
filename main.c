@@ -41,20 +41,13 @@ static INLINE void transform() {
     for (i = 0; i < STATE_SIZE; i++) {
       int a, b;
 
-      indexNext = INDICES[i];
-      a = state[index];
-      b = state[indexNext];
-      
-      index = indexNext;
-      leftPart[i] = f(a, b);
+      leftPart[i] = f(a = state[index], b = state[index = INDICES[i]]);
       rightPart[i] = f(b, a);
     }
 
     for (i = 0; i < STATE_SIZE; i++) {
 
-      indexNext = INDICES[i];
-      state[i] = f(leftPart[index], rightPart[indexNext]);
-      index = indexNext;
+      state[i] = f(leftPart[index], rightPart[index = INDICES[i]]);
     }
   }
 }
@@ -107,12 +100,12 @@ void main()
   while(1) {
     transform();
     count++;
-    if(count >= 1000) break;
+    if(count >= 10000) break;
   }
 
   clock_gettime(CLOCK_MONOTONIC, &end);
   totalDiff = time_since(&start, &end);
   
-  fprintf(stderr, "Total %ld transforms per second.\r\n", (long)(1000/totalDiff));
+  fprintf(stderr, "Total %ld transforms per second.\r\n", (long)(10000/totalDiff));
   getchar();
 }
